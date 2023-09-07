@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-builder-frontend
+  labels:
+    app: app-builder-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-builder-frontend
+  template:
+    metadata:
+      labels:
+        app: app-builder-frontend
+    spec:
+      containers:
+      - name: app-builder-frontend
+        image: oumaima12/app-builder-frontend:v1
+        ports:
+        - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-builder-frontend-service
+spec:
+  selector:
+    app: app-builder-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-builder-frontend-ingress
+spec:
+  rules:
+    - host: appbuilder.com  
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-builder-frontend-service
+                port:
+                  number: 80
